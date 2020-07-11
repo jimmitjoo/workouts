@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'sam-app
+
+  Sample SAM Template for sam-app
+
+  '
+Globals:
+  Function:
+    Timeout: 30
+    Environment:
+      Variables:
+        DB_HOST: materun-dev.cfrj5305jcit.eu-north-1.rds.amazonaws.com
+        DB_USER: admin
+        DB_PASS: wjqDStkjWiVRQzCDxxgO
+        DB_NAME: materun
+Resources:
+  CreateAccountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://materun-api-artifacts/1584e92b091094e98b5d92272c258ac9
+      Handler: create-account
+      Runtime: go1.x
+      MemorySize: 2048
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-4fc2d527
+        SubnetIds:
+        - subnet-8705cbee
+        - subnet-ae050ee4
+        - subnet-e5678e9e
+      Events:
+        CreateAccount:
+          Type: Api
+          Properties:
+            Path: /create-account
+            Method: post
+  SignInFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://materun-api-artifacts/eeb18a3633ba5db989f8ac41ae0bdaa4
+      Handler: sign-in
+      Runtime: go1.x
+      MemorySize: 2048
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-4fc2d527
+        SubnetIds:
+        - subnet-8705cbee
+        - subnet-ae050ee4
+        - subnet-e5678e9e
+      Events:
+        CreateAccount:
+          Type: Api
+          Properties:
+            Path: /sign-in
+            Method: post

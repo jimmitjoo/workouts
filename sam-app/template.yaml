@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-app
+
+  Sample SAM Template for sam-app
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+    Environment:
+      Variables:
+        DB_HOST: 'materun-dev.cfrj5305jcit.eu-north-1.rds.amazonaws.com'
+        DB_USER: 'admin'
+        DB_PASS: 'wjqDStkjWiVRQzCDxxgO'
+        DB_NAME: 'materun'
+
+Resources:
+  CreateAccountFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./create-account/
+      Handler: create-account
+      Runtime: go1.x
+      MemorySize: 2048
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-4fc2d527
+        SubnetIds:
+          - subnet-8705cbee
+          - subnet-ae050ee4
+          - subnet-e5678e9e
+      Events:
+        CreateAccount:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /create-account
+            Method: post
+
+  SignInFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./sign-in/
+      Handler: sign-in
+      Runtime: go1.x
+      MemorySize: 2048
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-4fc2d527
+        SubnetIds:
+          - subnet-8705cbee
+          - subnet-ae050ee4
+          - subnet-e5678e9e
+      Events:
+        CreateAccount:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /sign-in
+            Method: post
