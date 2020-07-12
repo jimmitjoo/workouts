@@ -4,11 +4,13 @@ import * as React from 'react';
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import WorkoutsScreen from '../screens/WorkoutsScreen';
+import {View} from 'react-native';
 import LinksScreen from "../screens/LinksScreen";
 import FontAwesomeIcon from "../components/FontAwesomeIcon";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import AntDesignIcon from "../components/AntDesignIcon";
+import { useStateValue } from "../globalState";
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
@@ -18,6 +20,39 @@ export default function BottomTabNavigator({navigation, route}) {
     // currently active tab. Learn more in the documentation:
     // https://reactnavigation.org/docs/en/screen-options-resolution.html
     navigation.setOptions({headerTitle: getHeaderTitle(route)});
+
+    const [{currentUserKey}, dispatch] = useStateValue();
+
+    function renderSignUp() {
+        if (currentUserKey === null) {
+
+            return <BottomTab.Screen
+                name="SignUp"
+                component={SignUpScreen}
+                options={{
+                    title: 'Sign Up',
+                    tabBarIcon: ({focused}) => <AntDesignIcon focused={focused} name="adduser"/>,
+                }}
+            />
+        }
+
+        return null;
+    }
+
+    function renderSignIn() {
+        if (currentUserKey === null) {
+            return <BottomTab.Screen
+                    name="SignIn"
+                    component={SignInScreen}
+                    options={{
+                        title: 'Sign In',
+                        tabBarIcon: ({focused}) => <AntDesignIcon focused={focused} name="login"/>,
+                    }}
+                />
+        }
+
+        return null;
+    }
 
     return (
         <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
@@ -29,22 +64,9 @@ export default function BottomTabNavigator({navigation, route}) {
                     tabBarIcon: ({focused}) => <AntDesignIcon focused={focused} name="smileo"/>,
                 }}
             />
-            <BottomTab.Screen
-                name="SignIn"
-                component={SignInScreen}
-                options={{
-                    title: 'Sign In',
-                    tabBarIcon: ({focused}) => <AntDesignIcon focused={focused} name="login"/>,
-                }}
-            />
-            <BottomTab.Screen
-                name="SignUp"
-                component={SignUpScreen}
-                options={{
-                    title: 'Sign Up',
-                    tabBarIcon: ({focused}) => <AntDesignIcon focused={focused} name="adduser"/>,
-                }}
-            />
+
+            {renderSignIn()}
+            {renderSignUp()}
 
             <BottomTab.Screen
                 name="Workouts"

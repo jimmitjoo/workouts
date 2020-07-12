@@ -5,8 +5,11 @@ import Layout from "../constants/Layout";
 import AppLogo from "../components/AppLogo";
 import {SignUp} from "../backend/Api";
 import AntDesignIcon from "../components/AntDesignIcon";
+import {StateContext} from "../globalState";
 
 export default class SignUpScreen extends React.Component {
+
+    static contextType = StateContext;
 
     state = {
         name: '',
@@ -26,6 +29,8 @@ export default class SignUpScreen extends React.Component {
 
     performSignUp() {
 
+        const [{}, dispatch] = this.context;
+
         this.setState({
             loading: true,
             errorMsg: false,
@@ -34,7 +39,20 @@ export default class SignUpScreen extends React.Component {
         SignUp(this.state.name, this.state.email, this.state.password).then(res => {
 
             if (res.success) {
-                alert('redirect to workouts!!');
+
+                dispatch({
+                    type: 'setUserKey',
+                    currentUserKey: res.sign_in_key,
+                });
+                dispatch({
+                    type: 'updateUser',
+                    user: {
+                        firstname: this.state.name,
+                        email: this.state.email
+                    },
+                });
+
+                navigator.navigate("SignIn");
             }
 
             if (res.error) {

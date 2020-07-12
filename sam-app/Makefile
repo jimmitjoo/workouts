@@ -8,6 +8,7 @@ deps:
 	go get -v ./...
 
 clean:
+	rm -rf ./account/account
 	rm -rf ./sign-in/sign-in
 	rm -rf ./create-account/create-account
 
@@ -24,5 +25,6 @@ delete:
 	aws cloudformation delete-stack --stack-name ${STACK} --region ${REGION} --profile ${PROFILE}
 
 build: clean
+	GOOS=linux GOARCH=amd64 go build -o account/account ./account
 	GOOS=linux GOARCH=amd64 go build -o sign-in/sign-in ./sign-in
 	GOOS=linux GOARCH=amd64 go build -o create-account/create-account ./create-account

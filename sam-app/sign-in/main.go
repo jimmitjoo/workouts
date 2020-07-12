@@ -14,8 +14,9 @@ func main() {
 }
 
 type body struct {
+	Email     string `json:"email"`
 	SignInKey string `json:"sign_in_key"`
-	Message string `json:"message"`
+	Message   string `json:"message"`
 }
 
 type postBody struct {
@@ -63,11 +64,20 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	if userKey != "" {
-		bodyMessage, _ = json.Marshal(body{
-			SignInKey: userKey,
-			Message:   "You could successfully sign in.",
-		})
-		statusCode = 201
+		user, err := Account.Info(userKey)
+		if err != nil {
+			bodyMessage, _ = json.Marshal(body{
+				Message: err.Error(),
+			})
+			statusCode = 400
+		} else {
+			bodyMessage, _ = json.Marshal(body{
+				Email:     user.Email,
+				SignInKey: userKey,
+				Message:   "You could successfully sign in.",
+			})
+			statusCode = 201
+		}
 	} else {
 		bodyMessage, _ = json.Marshal(body{
 			Message: "Wrong credentials.",

@@ -6,10 +6,12 @@ import AppLogo from "../components/AppLogo";
 import {SignIn, SignOut, SignUp} from "../backend/Api";
 import AntDesignIcon from "../components/AntDesignIcon";
 import * as SecureStore from "expo-secure-store";
-
+import { StateContext } from "../globalState";
 
 
 export default class SignInScreen extends React.Component {
+
+    static contextType = StateContext;
 
     state = {
         email: '',
@@ -17,22 +19,11 @@ export default class SignInScreen extends React.Component {
 
         loading: false,
         errorMsg: false,
-        signedIn: false,
     };
 
-    componentDidMount() {
-
-        SecureStore.getItemAsync('signInKey').then(signInKey => {
-            console.log({'signInKey': signInKey});
-            if (signInKey === null) {
-                this.setState({signedIn: false});
-            } else if (signInKey !== "") {
-                this.setState({signedIn: true});
-            }
-        })
-    }
-
     performSignIn(email, password) {
+
+        const [{}, dispatch] = this.context;
 
         this.setState({loading: true, errorMsg: false});
 
@@ -42,13 +33,16 @@ export default class SignInScreen extends React.Component {
                 this.setState({
                     email: '',
                     password: '',
-                    signedIn: true
                 });
 
                 dispatch({
-                    type: 'changeUserStatus',
-                    signedIn: { signedIn: true }
-                })
+                    type: 'setUserKey',
+                    currentUserKey: res.sign_in_key,
+                });
+                dispatch({
+                    type: 'updateUser',
+                    user: {email: res.email},
+                });
             }
 
             if (res.error) {
@@ -66,8 +60,13 @@ export default class SignInScreen extends React.Component {
     }
 
     performSignOut() {
+        const [{}, dispatch] = this.context;
+
         SignOut();
-        this.setState({signedIn: false});
+        dispatch({
+            type: 'setUserKey',
+            currentUserKey: null,
+        });
     }
 
     renderLoadingIcon() {
@@ -86,7 +85,9 @@ export default class SignInScreen extends React.Component {
 
     renderLoginForm() {
 
-        if (this.state.signedIn === true) {
+        const [{ currentUserKey }, dispatch] = this.context;
+
+        if (currentUserKey) {
             return <View>
                 <Text>You are already signed in.</Text>
                 <Button onPress={() => this.performSignOut()} title={"Log out"}/>

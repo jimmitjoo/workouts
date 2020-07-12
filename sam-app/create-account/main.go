@@ -15,6 +15,7 @@ func main() {
 
 type body struct {
 	Id int64 `json:"id"`
+	SignInKey string `json:"sign_in_key"`
 	Message string `json:"message"`
 }
 
@@ -81,12 +82,13 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		}, err
 	}
 
-	userId, err := Account.SignUp(postData.Email, postData.Password)
 
-	if userId > 0 {
+	userKey, err := Account.SignUp(postData.Email, postData.Password)
+
+	if userKey != "" {
 		bodyMessage, _ = json.Marshal(body{
-			Id: userId,
-			Message: "Your account is successfully created.",
+			SignInKey: userKey,
+			Message:   "Your account is successfully created.",
 		})
 		statusCode = 201
 	} else {

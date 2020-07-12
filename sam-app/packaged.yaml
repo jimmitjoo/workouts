@@ -18,7 +18,7 @@ Resources:
   CreateAccountFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/1584e92b091094e98b5d92272c258ac9
+      CodeUri: s3://materun-api-artifacts/1029f9a29af20d14ef89c3598a54a0ba
       Handler: create-account
       Runtime: go1.x
       MemorySize: 2048
@@ -38,7 +38,7 @@ Resources:
   SignInFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/eeb18a3633ba5db989f8ac41ae0bdaa4
+      CodeUri: s3://materun-api-artifacts/7d81089ef6f5b0f3285b9ccc805af935
       Handler: sign-in
       Runtime: go1.x
       MemorySize: 2048
@@ -54,4 +54,23 @@ Resources:
           Type: Api
           Properties:
             Path: /sign-in
+            Method: post
+  AccountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://materun-api-artifacts/da4c5a8c1cdc1478cf6c0e283e6ce3f7
+      Handler: account
+      Runtime: go1.x
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-4fc2d527
+        SubnetIds:
+        - subnet-8705cbee
+        - subnet-ae050ee4
+        - subnet-e5678e9e
+      Events:
+        CreateAccount:
+          Type: Api
+          Properties:
+            Path: /account
             Method: post

@@ -11,6 +11,12 @@ import (
 	"time"
 )
 
+type User struct {
+	Firstname string `json:"firstname"`
+	Lastname string `json:"lastname"`
+	Email string `json:"email"`
+}
+
 func Exists(email string) bool {
 	db := Database.Connect()
 
@@ -30,12 +36,12 @@ func Exists(email string) bool {
 	return false
 }
 
-func SignUp(email string, password string) (int64, error) {
+func SignUp(email string, password string) (string, error) {
 	db := Database.Connect()
 
 	stmt, err := db.Prepare("INSERT users SET email=?, password=?")
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 	defer stmt.Close()
 
@@ -44,12 +50,15 @@ func SignUp(email string, password string) (int64, error) {
 
 	res, err := stmt.Exec(email, hashedPassword)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 
 	insertedId, err := res.LastInsertId()
+	if err != nil {
+		return "", err
+	}
 
-	return insertedId, err
+	return setActionKey(int(insertedId))
 }
 
 func SignIn(email string, password string) (string, error) {
@@ -73,30 +82,83 @@ func SignIn(email string, password string) (string, error) {
 	if err != nil {
 		return "", errors.New("wrong credentials")
 	} else {
-		updateAction, err := db.Prepare("UPDATE users SET action_key=?, last_action_time=? WHERE id=?")
-		if err != nil {
-			return "", err
-		}
-
-		var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-		actionKey := make([]rune, 50)
-		for i := range actionKey {
-			actionKey[i] = letters[rand.Intn(len(letters))]
-		}
-		log.Println(string(actionKey))
-
-		log.Println(id)
-
-		currentTime := time.Now().String()
-		currentTimeString := currentTime[0:19]
-
-		log.Println("UPDATE users SET action_key=" + string(actionKey) + ", last_action_time=" + currentTimeString + " WHERE id=" + strconv.Itoa(id))
-		_, err = updateAction.Exec(string(actionKey), currentTimeString, id)
-		if err != nil {
-			return "", err
-		}
-
-		return string(actionKey), nil
+		return setActionKey(id)
 	}
+}
+
+func randomString(id int) string {
+	var letters = []rune(strconv.Itoa(id) + "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	actionKey := make([]rune, 50)
+	for i := range actionKey {
+		actionKey[i] = letters[rand.Intn(len(letters))]
+	}
+
+	return string(actionKey)
+}
+
+func setActionKey(id int) (string, error) {
+	db := Database.Connect()
+
+	updateAction, err := db.Prepare("UPDATE users SET action_key=?, last_action_time=? WHERE id=?")
+	if err != nil {
+		return "", errors.New("something went wrong when preparing update of action key")
+	}
+
+	actionKey := randomString(id)
+
+	currentTime := time.Now().String()
+	currentTimeString := currentTime[0:19]
+
+	log.Println("UPDATE users SET action_key=" + string(actionKey) + ", last_action_time=" + currentTimeString + " WHERE id=" + strconv.Itoa(id))
+	_, err = updateAction.Exec(string(actionKey), currentTimeString, id)
+	if err != nil {
+		return "", errors.New("something went wrong when updating the action key")
+	}
+
+	return actionKey, nil
+}
+
+func Action(actionKey string) (string, error) {
+	db := Database.Connect()
+
+	updateAction, err := db.Prepare("UPDATE users SET last_action_time=? WHERE id=?")
+	if err != nil {
+		return actionKey, errors.New("something went wrong when preparing update of action key")
+	}
+
+	currentTime := time.Now().String()
+	currentTimeString := currentTime[0:19]
+
+	log.Println("UPDATE users SET last_action_time=" + currentTimeString + " WHERE action_key=" + actionKey)
+	_, err = updateAction.Exec(currentTimeString, actionKey)
+	if err != nil {
+		return actionKey, errors.New("something went wrong when updating the action key")
+	}
+
+	return actionKey, nil
+}
+
+func Info(actionKey string) (User, error) {
+	db := Database.Connect()
+
+	var user User
+	var email string
+	var firstname sql.NullString
+	var lastname sql.NullString
+
+	err := db.QueryRow("SELECT firstname, lastname, email FROM users WHERE action_key=?", actionKey).Scan(&firstname, &lastname, &email)
+	if err != nil {
+		return user, err
+	}
+
+	if firstname.Valid {
+		user.Firstname = firstname.String
+	}
+	if lastname.Valid {
+		user.Lastname = lastname.String
+	}
+	user.Email = email
+
+	return user, nil
 }

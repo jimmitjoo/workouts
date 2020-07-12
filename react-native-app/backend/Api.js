@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { useStateValue } from "../globalState";
 
 let root = 'https://y9y7etrj87.execute-api.eu-north-1.amazonaws.com/Prod';
 
@@ -28,6 +29,7 @@ export function SignIn(email, password) {
             if (json.sign_in_key && json.sign_in_key !== "") {
                 SecureStore.setItemAsync('signInKey', json.sign_in_key)
 
+                responseData.email = json.email;
                 responseData.sign_in_key = json.sign_in_key;
                 responseData.success = true;
 
@@ -86,9 +88,10 @@ export function SignUp(name, email, password) {
         .then((response) => response.json())
         .then((json) => {
 
-            if (parseInt(json.id) > 0) {
-                SecureStore.setItemAsync('userId', json.id)
+            if (json.sign_in_key && json.sign_in_key !== "") {
+                SecureStore.setItemAsync('signInKey', json.sign_in_key)
 
+                responseData.sign_in_key = json.sign_in_key;
                 responseData.success = true;
 
             } else {
@@ -113,5 +116,6 @@ export function SignUp(name, email, password) {
 export async function SignOut() {
     let signedOut = false;
     await SecureStore.deleteItemAsync('signInKey').then(r => signedOut = true);
+    await SecureStore.deleteItemAsync('user').then(r => signedOut = true);
     return signedOut;
 }
