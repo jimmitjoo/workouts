@@ -19,12 +19,21 @@ export default {
   },
 
   form: {
-    flex:1,
     paddingLeft: 30,
     paddingRight: 30
   },
   textInputs: {
     height: 40,
+    marginTop: 5,
+    borderWidth: 1,
+    marginBottom: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderColor: '#ddd',
+    borderRadius: 3
+  },
+  textAreaInputs: {
+    height: 140,
     marginTop: 5,
     borderWidth: 1,
     marginBottom: 5,
@@ -48,5 +57,17 @@ export default {
   helpLinkText: {
     fontSize: 14,
     color: '#2e78b7',
+  },
+
+  textContainer: {
+    alignItems: 'center',
+    marginHorizontal: 50,
+  },
+  text: {
+    fontSize: 17,
+    color: 'rgba(96,100,109, 1)',
+    lineHeight: 24,
+    textAlign: 'center',
+    paddingTop: 12,
   },
 };

@@ -1,72 +1,128 @@
 import * as React from 'react';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
+import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
 import * as Location from 'expo-location';
 import Layout from "../constants/Layout";
+import WorkoutPlanning from "../components/Workouts/WorkoutPlanning";
+import {StateContext} from "../globalState";
 
-export default function WorkoutsScreen() {
+export default class WorkoutsScreen extends React.Component {
 
-    const [errorMsg, setErrorMsg] = React.useState(null);
-    const [queryParams, setQueryParams] = React.useState(null);
+    _isMounted = false;
 
-    React.useEffect(() => {
-        getLocation(setErrorMsg, setQueryParams);
-    });
+    static contextType = StateContext;
 
-    function renderErrorMessage() {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            errorMsg: null,
+            queryParams: null,
+
+            showCreateWorkout: false,
+        };
+    }
+
+    componentDidMount() {
+
+        this._isMounted = true;
+
+        this.getLocation();
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+    async getLocation() {
+        let {status} = await Location.requestPermissionsAsync();
+
+        if (status !== 'granted' && this._isMounted) {
+            this.setState({
+                errorMsg: 'Permission to access location was denied'
+            });
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+
+        let latitude = JSON.stringify(location.coords.latitude).substring(0, 8);
+        let longitude = JSON.stringify(location.coords.longitude).substr(0, 8);
+
+        if (this._isMounted) {
+            this.setState({
+                queryParams: '?lat=' + latitude + '&lng=' + longitude
+            })
+        }
+    }
+
+    renderErrorMessage() {
         let render = null;
-        if (errorMsg) {
-            render = <Text style={Layout.errorMessage}>{errorMsg}</Text>
+        if (this.state.errorMsg) {
+            render = <Text style={Layout.errorMessage}>{this.state.errorMsg}</Text>
         }
 
         return render
     }
 
-    return (
-        <View style={Layout.container}>
-            {renderErrorMessage()}
-            <FlatList
-                data={[
-                    { key: 'Devin' },
-                    { key: 'Dan' },
-                    { key: 'Dominic' },
-                    { key: 'Jackson' },
-                    { key: 'James' },
-                    { key: 'Joel' },
-                    { key: 'John' },
-                    { key: 'Jillian' },
-                    { key: 'Jimmy' },
-                    { key: 'Julie' },
-                    { key: '2Devin' },
-                    { key: '2Dan' },
-                    { key: '2Dominic' },
-                    { key: '2Jackson' },
-                    { key: 'J2ames' },
-                    { key: '2Joel' },
-                    { key: '2John' },
-                    { key: '2Jillian' },
-                    { key: '2Jimmy' },
-                    { key: '2Julie' },
-                ]}
-                renderItem={({ item }) => <Text style={styles.item}>{item.key}</Text>}
-            />
-            <Text>{queryParams}</Text>
-        </View>
-    );
-}
+    renderCreateWorkoutButton() {
+        const [{currentUserKey}, dispatch] = this.context;
 
-async function getLocation(setErrorMsg, setQueryParams) {
-    let { status } = await Location.requestPermissionsAsync();
-
-    if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+        if (!this.state.showCreateWorkout && currentUserKey) {
+            return <Button onPress={() => this.setState({showCreateWorkout: true})} title={"Schedule Workout"}/>
+        }
     }
 
-    let location = await Location.getCurrentPositionAsync({});
+    renderWorkoutPlanning() {
+        if (this.state.showCreateWorkout) {
+            return <View>
+                <WorkoutPlanning/>
+                <Button onPress={() => this.setState({showCreateWorkout: false})} title={"Cancel"}/>
+            </View>
+        }
+    }
 
-    let latitude = JSON.stringify(location.coords.latitude).substring(0,8);
-    let longitude = JSON.stringify(location.coords.longitude).substr(0,8);
+    renderWorkoutList() {
+        if (!this.state.showCreateWorkout) {
+            return <View style={Layout.container}>
+                <FlatList
+                    data={[
+                        {key: 'Devin'},
+                        {key: 'Dan'},
+                        {key: 'Dominic'},
+                        {key: 'Jackson'},
+                        {key: 'James'},
+                        {key: 'Joel'},
+                        {key: 'John'},
+                        {key: 'Jillian'},
+                        {key: 'Jimmy'},
+                        {key: 'Julie'},
+                        {key: '2Devin'},
+                        {key: '2Dan'},
+                        {key: '2Dominic'},
+                        {key: '2Jackson'},
+                        {key: 'J2ames'},
+                        {key: '2Joel'},
+                        {key: '2John'},
+                        {key: '2Jillian'},
+                        {key: '2Jimmy'},
+                        {key: '2Julie'},
+                    ]}
+                    renderItem={({item}) => <Text style={styles.item}>{item.key}</Text>}
+                />
+                <Text>{this.state.queryParams}</Text>
+            </View>
+        }
+    }
 
-    setQueryParams('?lat=' + latitude + '&lng=' + longitude)
+    render() {
+        return (
+            <View style={Layout.container}>
+                {this.renderWorkoutPlanning()}
+                {this.renderErrorMessage()}
+                {this.renderWorkoutList()}
+                {this.renderCreateWorkoutButton()}
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({

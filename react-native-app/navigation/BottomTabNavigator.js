@@ -89,6 +89,6 @@ function getHeaderTitle(route) {
         case 'Links':
             return 'Links to learn more';
         case 'Workouts':
-            return 'Find workouts to join!';
+            return 'Where\'s the Workout?!';
     }
 }
