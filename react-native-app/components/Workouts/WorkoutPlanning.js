@@ -3,10 +3,13 @@ import {Button, Dimensions, Picker, Text, TextInput, View} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MapView, {Marker} from 'react-native-maps'
 import Layout from "../../constants/Layout";
+import {StateContext} from "../../globalState";
 
 export default class WorkoutPlanning extends React.Component {
 
     _isMounted = false;
+
+    static contextType = StateContext;
 
     constructor(props) {
         super(props);
@@ -217,12 +220,18 @@ export default class WorkoutPlanning extends React.Component {
     }
 
     render() {
-        return <View>
-            {this.renderDatePicker()}
-            {this.renderActivityPicker()}
-            {this.renderLocationPicker()}
-            {this.renderNamingForm()}
-        </View>
+        const [{currentUserKey}, dispatch] = this.context;
+
+        if (currentUserKey) {
+            return <View>
+                {this.renderDatePicker()}
+                {this.renderActivityPicker()}
+                {this.renderLocationPicker()}
+                {this.renderNamingForm()}
+            </View>
+        }
+
+        return null
     }
 
 }

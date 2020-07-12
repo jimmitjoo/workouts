@@ -72,7 +72,9 @@ export default class WorkoutsScreen extends React.Component {
     }
 
     renderWorkoutPlanning() {
-        if (this.state.showCreateWorkout) {
+        const [{currentUserKey}, dispatch] = this.context;
+
+        if (this.state.showCreateWorkout && currentUserKey) {
             return <View>
                 <WorkoutPlanning/>
                 <Button onPress={() => this.setState({showCreateWorkout: false})} title={"Cancel"}/>
@@ -81,7 +83,9 @@ export default class WorkoutsScreen extends React.Component {
     }
 
     renderWorkoutList() {
-        if (!this.state.showCreateWorkout) {
+        const [{currentUserKey}, dispatch] = this.context;
+
+        if (!this.state.showCreateWorkout || currentUserKey === null) {
             return <View style={Layout.container}>
                 <FlatList
                     data={[
@@ -114,12 +118,23 @@ export default class WorkoutsScreen extends React.Component {
     }
 
     render() {
+        const [{currentUserKey}, dispatch] = this.context;
+
+        if (currentUserKey) {
+            return (
+                <View style={Layout.container}>
+                    {this.renderWorkoutPlanning()}
+                    {this.renderErrorMessage()}
+                    {this.renderWorkoutList()}
+                    {this.renderCreateWorkoutButton()}
+                </View>
+            );
+        }
+
         return (
             <View style={Layout.container}>
-                {this.renderWorkoutPlanning()}
                 {this.renderErrorMessage()}
                 {this.renderWorkoutList()}
-                {this.renderCreateWorkoutButton()}
             </View>
         );
     }
