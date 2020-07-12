@@ -62,7 +62,7 @@ export default class SignUpScreen extends React.Component {
                     },
                 });
 
-                navigator.navigate("SignIn");
+                this.props.navigation.navigate("Workouts")
             }
 
             if (res.error && this._isMounted) {

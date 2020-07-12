@@ -61,6 +61,8 @@ export default class SignInScreen extends React.Component {
                     type: 'updateUser',
                     user: {email: res.email},
                 });
+
+                this.props.navigation.navigate("Workouts")
             }
 
             if (res.error && this._isMounted) {

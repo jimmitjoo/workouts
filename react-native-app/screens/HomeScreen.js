@@ -85,7 +85,7 @@ export default class HomeScreen extends React.Component {
             <View style={styles.buttonsContainer}>
                 <Button title={"Sign In"} onPress={() => this.props.navigation.navigate('SignIn')}/>
                 <Button title={"Create Account"} onPress={() => this.props.navigation.navigate('SignUp')}/>
-                <Button title={"Peek Without Account"} onPress={() => this.props.navigation.navigate('Workouts')}/>
+                <Button title={"Where's the Workout?"} onPress={() => this.props.navigation.navigate('Workouts')}/>
             </View>
 
             <View style={Layout.helpLinkContainer}>
