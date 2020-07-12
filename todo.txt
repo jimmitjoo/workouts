@@ -1,11 +1,14 @@
-Bara en TODO-fil så vi har lite routes att gå på =)
+Vilka routes är kvar att bygga?
 
-/login-without-account POST
-/login POST
-/create-account POST
 /workouts GET, POST
 /workouts/:id: GET, PUT, DELETE
 /workouts/:id:/join POST, DELETE
 /followers GET
 /following GET
 /following/:user_id: POST, DELETE
+
+Vilka routes har vi byggt?
+
+/sign-up POST
+/sign-in POST
+/account POST

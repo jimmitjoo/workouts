@@ -3,13 +3,10 @@ import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
 import {Platform, StatusBar, StyleSheet, View} from 'react-native';
 
-import WorkoutsScreen from "./screens/WorkoutsScreen";
 import useCachedResources from './hooks/useCachedResources';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
-import checkUserStatus from "./hooks/isUserSignedIn";
 import { StateProvider } from "./globalState";
-import * as SecureStore from "expo-secure-store";
 
 const Stack = createStackNavigator();
 

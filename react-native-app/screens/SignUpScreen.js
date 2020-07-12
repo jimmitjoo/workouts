@@ -9,36 +9,46 @@ import {StateContext} from "../globalState";
 
 export default class SignUpScreen extends React.Component {
 
+    _isMounted = false;
+
     static contextType = StateContext;
-
-    state = {
-        name: '',
-        email: '',
-        password: '',
-
-        loading: false,
-        errorMsg: false,
-        signedIn: false,
-    };
 
     constructor(props) {
         super(props);
 
+        this.state = {
+            name: '',
+            email: '',
+            password: '',
 
+            loading: false,
+            errorMsg: false,
+            signedIn: false,
+        };
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     performSignUp() {
 
         const [{}, dispatch] = this.context;
 
-        this.setState({
-            loading: true,
-            errorMsg: false,
-        })
+        if (this._isMounted) {
+            this.setState({
+                loading: true,
+                errorMsg: false,
+            })
+        }
 
         SignUp(this.state.name, this.state.email, this.state.password).then(res => {
 
-            if (res.success) {
+            if (res.success && this._isMounted) {
 
                 dispatch({
                     type: 'setUserKey',
@@ -55,22 +65,20 @@ export default class SignUpScreen extends React.Component {
                 navigator.navigate("SignIn");
             }
 
-            if (res.error) {
+            if (res.error && this._isMounted) {
                 this.setState({
-                    errorMsg: res.error,
+                    errorMsg: res.error, loading: false,
                 });
             }
 
-            this.setState({
-                loading: false,
-            })
-
         }).catch(err => {
 
-            this.setState({
-                loading: false,
-                errorMsg: err.data,
-            })
+            if (this._isMounted) {
+                this.setState({
+                    loading: false,
+                    errorMsg: err.data,
+                })
+            }
 
         });
 
@@ -128,12 +136,15 @@ export default class SignUpScreen extends React.Component {
                             value={this.state.password}
                         />
 
-                        <Button onPress={() => this.performSignUp(this.state.name, this.state.email, this.state.password)} title={"Create Account"}/>
+                        <Button
+                            onPress={() => this.performSignUp(this.state.name, this.state.email, this.state.password)}
+                            title={"Create Account"}/>
 
                     </View>
 
                     <View style={Layout.helpLinkContainer}>
-                        <Text onPress={() => navigation.navigate("SignIn")} style={Layout.helpLinkText}>Already got an
+                        <Text onPress={() => this.props.navigation.navigate("SignIn")} style={Layout.helpLinkText}>Already
+                            got an
                             account? Login here!</Text>
                     </View>
 

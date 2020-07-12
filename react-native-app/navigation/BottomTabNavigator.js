@@ -1,12 +1,8 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import * as React from 'react';
 
-import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import WorkoutsScreen from '../screens/WorkoutsScreen';
-import {View} from 'react-native';
-import LinksScreen from "../screens/LinksScreen";
-import FontAwesomeIcon from "../components/FontAwesomeIcon";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import AntDesignIcon from "../components/AntDesignIcon";

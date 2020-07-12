@@ -5,35 +5,53 @@ import {ScrollView} from 'react-native-gesture-handler';
 import AppLogo from "../components/AppLogo";
 import {SignIn, SignOut, SignUp} from "../backend/Api";
 import AntDesignIcon from "../components/AntDesignIcon";
-import * as SecureStore from "expo-secure-store";
-import { StateContext } from "../globalState";
+import {StateContext} from "../globalState";
 
 
 export default class SignInScreen extends React.Component {
 
+    _isMounted = false;
+
     static contextType = StateContext;
 
-    state = {
-        email: '',
-        password: '',
+    constructor(props) {
+        super(props);
 
-        loading: false,
-        errorMsg: false,
-    };
+        this.state = {
+            email: '',
+            password: '',
+
+            loading: false,
+            errorMsg: false,
+        };
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
 
     performSignIn(email, password) {
 
         const [{}, dispatch] = this.context;
 
-        this.setState({loading: true, errorMsg: false});
+        if (this._isMounted) {
+            this.setState({loading: true, errorMsg: false});
+        }
 
         SignIn(email, password).then(res => {
 
             if (res.success) {
-                this.setState({
-                    email: '',
-                    password: '',
-                });
+                if (this._isMounted) {
+                    this.setState({
+                        email: '',
+                        password: '',
+                        loading: false
+                    });
+                }
 
                 dispatch({
                     type: 'setUserKey',
@@ -45,17 +63,14 @@ export default class SignInScreen extends React.Component {
                 });
             }
 
-            if (res.error) {
-                this.setState({password: '', errorMsg: res.error});
+            if (res.error && this._isMounted) {
+                this.setState({password: '', errorMsg: res.error, loading: false});
             }
 
-            this.setState({loading: false});
-
         }).catch(err => {
-
-            this.setState({loading: false});
-
-            this.setState({errorMsg: err.data});
+            if (this._isMounted) {
+                this.setState({loading: false, errorMsg: err.data});
+            }
         });
     }
 
@@ -85,7 +100,7 @@ export default class SignInScreen extends React.Component {
 
     renderLoginForm() {
 
-        const [{ currentUserKey }, dispatch] = this.context;
+        const [{currentUserKey}, dispatch] = this.context;
 
         if (currentUserKey) {
             return <View>
@@ -94,35 +109,38 @@ export default class SignInScreen extends React.Component {
             </View>
         }
 
-        return <View><View style={Layout.form}>
-            <TextInput
-                autoFocus={true}
-                returnKeyType={'next'}
-                keyboardType={'email-address'}
-                placeholder={'your@email.com'}
-                textContentType={'emailAddress'}
-                style={Layout.textInputs}
-                onChangeText={text => this.setState({email: text})}
-                value={this.state.email}
-            />
-            <TextInput
-                returnKeyType={'go'}
-                keyboardType={'visible-password'}
-                placeholder={'Password'}
-                secureTextEntry={true}
-                textContentType={'password'}
-                style={Layout.textInputs}
-                onChangeText={text => this.setState({password: text})}
-                value={this.state.password}
-            />
+        return <View>
+            <View style={Layout.form}>
+                <TextInput
+                    autoFocus={true}
+                    returnKeyType={'next'}
+                    keyboardType={'email-address'}
+                    placeholder={'your@email.com'}
+                    textContentType={'emailAddress'}
+                    style={Layout.textInputs}
+                    onChangeText={text => this.setState({email: text})}
+                    value={this.state.email}
+                />
+                <TextInput
+                    returnKeyType={'go'}
+                    keyboardType={'visible-password'}
+                    placeholder={'Password'}
+                    secureTextEntry={true}
+                    textContentType={'password'}
+                    style={Layout.textInputs}
+                    onChangeText={text => this.setState({password: text})}
+                    value={this.state.password}
+                />
 
-            <Button onPress={() => this.performSignIn(this.state.email, this.state.password)} title={"Sign In"}/>
+                <Button onPress={() => this.performSignIn(this.state.email, this.state.password)} title={"Sign In"}/>
 
-        </View>
+            </View>
             <View style={Layout.helpLinkContainer}>
-                <Text onPress={() => navigation.navigate("SignUp")} style={Layout.helpLinkText}>Got no account?
+                <Text onPress={() => this.props.navigation.navigate("SignUp")} style={Layout.helpLinkText}>Got no
+                    account?
                     Create one!</Text>
-            </View></View>;
+            </View>
+        </View>;
     }
 
     render() {

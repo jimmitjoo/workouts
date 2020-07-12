@@ -4,35 +4,50 @@ import {Button, StyleSheet, Text, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import AppLogo from "../components/AppLogo";
 import Layout from "../constants/Layout";
-import {useStateValue} from "../globalState";
+import {StateContext, useStateValue} from "../globalState";
 import * as SecureStore from "expo-secure-store";
 import {SignOut} from "../backend/Api";
 
-export default function HomeScreen({navigation}) {
+export default class HomeScreen extends React.Component {
 
-    const [{currentUserKey, user}, dispatch] = useStateValue();
+    _isMounted = false;
 
-    console.log(user)
-    console.log(currentUserKey)
+    static contextType = StateContext;
 
-    SecureStore.getItemAsync('signInKey').then(signInKey => {
-        if (signInKey === null) {
-            dispatch({
-                type: 'setUserKey',
-                currentUserKey: null,
-            });
-        } else if (signInKey !== "") {
-            dispatch({
-                type: 'setUserKey',
-                currentUserKey: signInKey,
-            });
-            getUser();
-        }
-    });
+    constructor(props) {
+        super(props);
+    }
 
-    function getUser() {
+    componentDidMount() {
+        this._isMounted = true;
+
+        const [{}, dispatch] = this.context;
+
+        SecureStore.getItemAsync('signInKey').then(signInKey => {
+            if (signInKey === null && this._isMounted) {
+                dispatch({
+                    type: 'setUserKey',
+                    currentUserKey: null,
+                });
+            } else if (signInKey !== "" && this._isMounted) {
+                dispatch({
+                    type: 'setUserKey',
+                    currentUserKey: signInKey,
+                });
+                this.getUser();
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+    getUser() {
+        const [{}, dispatch] = this.context;
+
         SecureStore.getItemAsync('user').then(userData => {
-            if (userData !== null) {
+            if (userData !== null && this._isMounted) {
                 dispatch({
                     type: 'updateUser',
                     user: {
@@ -45,24 +60,32 @@ export default function HomeScreen({navigation}) {
         })
     }
 
-    function signOutUser() {
+    signOutUser() {
+        const [{}, dispatch] = this.context;
+
         SignOut();
+        dispatch({
+            type: 'setUserKey',
+            currentUserKey: null,
+        });
         dispatch({
             type: 'updateUser',
             user: {},
         });
     }
 
-    function renderSignedOutButtons() {
+    renderSignedOutButtons() {
+        const [{currentUserKey}, dispatch] = this.context;
+
         if (currentUserKey) return <View style={styles.buttonsContainer}>
-            <Button title={"Sign Out"} onPress={() => signOutUser()}/>
+            <Button title={"Sign Out"} onPress={() => this.signOutUser()}/>
         </View>;
 
         return <View>
             <View style={styles.buttonsContainer}>
-                <Button title={"Sign In"} onPress={() => navigation.navigate('SignIn')}/>
-                <Button title={"Create Account"} onPress={() => navigation.navigate('SignUp')}/>
-                <Button title={"Peek Without Account"} onPress={() => navigation.navigate('Workouts')}/>
+                <Button title={"Sign In"} onPress={() => this.props.navigation.navigate('SignIn')}/>
+                <Button title={"Create Account"} onPress={() => this.props.navigation.navigate('SignUp')}/>
+                <Button title={"Peek Without Account"} onPress={() => this.props.navigation.navigate('Workouts')}/>
             </View>
 
             <View style={Layout.helpLinkContainer}>
@@ -72,20 +95,24 @@ export default function HomeScreen({navigation}) {
         </View>
     }
 
-    function renderEmail() {
+    renderEmail() {
+        const [{user}, dispatch] = this.context;
+
         if (user && user.email) {
             return <Text>{user.email}</Text>
         }
     }
 
-    function renderTextDepedningOnUserStatus() {
+    renderTextDepedningOnUserStatus() {
+
+        const [{currentUserKey}, dispatch] = this.context;
 
         if (currentUserKey) {
             return <View style={styles.getStartedContainer}>
 
                 <Text>{currentUserKey}</Text>
 
-                {renderEmail()}
+                {this.renderEmail()}
 
                 <Text style={styles.getStartedText}>
                     We believe in social exercise for a healthier world.
@@ -106,21 +133,20 @@ export default function HomeScreen({navigation}) {
 
     }
 
+    render() {
     return (
-
-
         <View style={Layout.container}>
             <ScrollView style={Layout.container} contentContainerStyle={Layout.contentContainer}>
                 <AppLogo/>
 
-                {renderTextDepedningOnUserStatus()}
+                {this.renderTextDepedningOnUserStatus()}
 
-                {renderSignedOutButtons()}
+                {this.renderSignedOutButtons()}
             </ScrollView>
 
         </View>
-
     )
+    }
 }
 
 HomeScreen.navigationOptions = {
