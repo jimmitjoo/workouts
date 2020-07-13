@@ -73,13 +73,14 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		})
 		statusCode = 400
 	} else {
+		Account.Action(postData.ActionKey)
+
 		bodyMessage, _ = json.Marshal(body{
 			Id: workoutId,
 			Message: "Workout created!",
 		})
 		statusCode = 201
 	}
-
 
 	return events.APIGatewayProxyResponse{
 		Body:       string(bodyMessage),

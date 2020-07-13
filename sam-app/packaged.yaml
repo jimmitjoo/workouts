@@ -18,7 +18,7 @@ Resources:
   CreateAccountFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/6543a5ebdf41a356dcbf12a26b3be7ee
+      CodeUri: s3://materun-api-artifacts/070241f238140b6216e04eabfc4b2928
       Handler: create-account
       Runtime: go1.x
       MemorySize: 2048
@@ -38,7 +38,7 @@ Resources:
   SignInFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/18d235f596a71bbed06d213385cf9754
+      CodeUri: s3://materun-api-artifacts/303074d8fd1e01f5bce8cd2ddfbc6bca
       Handler: sign-in
       Runtime: go1.x
       MemorySize: 2048
@@ -58,7 +58,7 @@ Resources:
   AccountFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/4facd46be94472e4149297e9037eef61
+      CodeUri: s3://materun-api-artifacts/9f7e70c37c38cac2b50a565fbc18cdd9
       Handler: account
       Runtime: go1.x
       VpcConfig:
@@ -77,7 +77,7 @@ Resources:
   CreateWorkoutFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/bea3b11fec309914450b8f58da66033d
+      CodeUri: s3://materun-api-artifacts/ff97ebaf7f81a4167942799c33fbcb30
       Handler: create-workout
       Runtime: go1.x
       VpcConfig:

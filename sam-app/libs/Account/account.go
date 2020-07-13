@@ -121,12 +121,12 @@ func setActionKey(id int) (string, error) {
 	return actionKey, nil
 }
 
-func Action(actionKey string) (string, error) {
+func Action(actionKey string) {
 	db := Database.Connect()
 
-	updateAction, err := db.Prepare("UPDATE users SET last_action_time=? WHERE id=?")
+	updateAction, err := db.Prepare("UPDATE users SET last_action_time=? WHERE action_key=?")
 	if err != nil {
-		return actionKey, errors.New("something went wrong when preparing update of action key")
+		panic(err)
 	}
 
 	currentTime := time.Now().String()
@@ -135,10 +135,8 @@ func Action(actionKey string) (string, error) {
 	log.Println("UPDATE users SET last_action_time=" + currentTimeString + " WHERE action_key=" + actionKey)
 	_, err = updateAction.Exec(currentTimeString, actionKey)
 	if err != nil {
-		return actionKey, errors.New("something went wrong when updating the action key")
+		panic(err)
 	}
-
-	return actionKey, nil
 }
 
 func Info(actionKey string) (User, error) {
