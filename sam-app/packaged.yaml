@@ -18,7 +18,7 @@ Resources:
   CreateAccountFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/1029f9a29af20d14ef89c3598a54a0ba
+      CodeUri: s3://materun-api-artifacts/6543a5ebdf41a356dcbf12a26b3be7ee
       Handler: create-account
       Runtime: go1.x
       MemorySize: 2048
@@ -38,7 +38,7 @@ Resources:
   SignInFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/7d81089ef6f5b0f3285b9ccc805af935
+      CodeUri: s3://materun-api-artifacts/18d235f596a71bbed06d213385cf9754
       Handler: sign-in
       Runtime: go1.x
       MemorySize: 2048
@@ -58,7 +58,7 @@ Resources:
   AccountFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://materun-api-artifacts/da4c5a8c1cdc1478cf6c0e283e6ce3f7
+      CodeUri: s3://materun-api-artifacts/4facd46be94472e4149297e9037eef61
       Handler: account
       Runtime: go1.x
       VpcConfig:
@@ -73,4 +73,23 @@ Resources:
           Type: Api
           Properties:
             Path: /account
+            Method: post
+  CreateWorkoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://materun-api-artifacts/bea3b11fec309914450b8f58da66033d
+      Handler: create-workout
+      Runtime: go1.x
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-4fc2d527
+        SubnetIds:
+        - subnet-8705cbee
+        - subnet-ae050ee4
+        - subnet-e5678e9e
+      Events:
+        CreateAccount:
+          Type: Api
+          Properties:
+            Path: /workouts
             Method: post

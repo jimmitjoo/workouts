@@ -4,6 +4,7 @@ import (
 	"../Database"
 	"database/sql"
 	"errors"
+	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"
@@ -12,6 +13,7 @@ import (
 )
 
 type User struct {
+	Id int `json:"id"`
 	Firstname string `json:"firstname"`
 	Lastname string `json:"lastname"`
 	Email string `json:"email"`
@@ -143,13 +145,14 @@ func Info(actionKey string) (User, error) {
 	db := Database.Connect()
 
 	var user User
+	var id int64
 	var email string
 	var firstname sql.NullString
 	var lastname sql.NullString
 
-	err := db.QueryRow("SELECT firstname, lastname, email FROM users WHERE action_key=?", actionKey).Scan(&firstname, &lastname, &email)
+	err := db.QueryRow("SELECT id, firstname, lastname, email FROM users WHERE action_key=?", actionKey).Scan(&id, &firstname, &lastname, &email)
 	if err != nil {
-		return user, err
+		panic(err)
 	}
 
 	if firstname.Valid {
@@ -159,6 +162,7 @@ func Info(actionKey string) (User, error) {
 		user.Lastname = lastname.String
 	}
 	user.Email = email
+	user.Id = int(id)
 
 	return user, nil
 }

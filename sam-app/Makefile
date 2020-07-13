@@ -11,6 +11,7 @@ clean:
 	rm -rf ./account/account
 	rm -rf ./sign-in/sign-in
 	rm -rf ./create-account/create-account
+	rm -rf ./create-workout/create-workout
 
 local: build
 	sam local start-api
@@ -28,3 +29,4 @@ build: clean
 	GOOS=linux GOARCH=amd64 go build -o account/account ./account
 	GOOS=linux GOARCH=amd64 go build -o sign-in/sign-in ./sign-in
 	GOOS=linux GOARCH=amd64 go build -o create-account/create-account ./create-account
+	GOOS=linux GOARCH=amd64 go build -o create-workout/create-workout ./create-workout

@@ -78,3 +78,23 @@ Resources:
           Properties:
             Path: /account
             Method: post
+
+  CreateWorkoutFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./create-workout/
+      Handler: create-workout
+      Runtime: go1.x
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-4fc2d527
+        SubnetIds:
+          - subnet-8705cbee
+          - subnet-ae050ee4
+          - subnet-e5678e9e
+      Events:
+        CreateAccount:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /workouts
+            Method: post
