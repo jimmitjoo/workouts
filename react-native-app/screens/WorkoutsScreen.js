@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import Layout from "../constants/Layout";
 import Planning from "../components/Workouts/Planning";
 import {StateContext} from "../globalState";
+import {FetchWorkouts} from "../backend/Api";
 
 export default class WorkoutsScreen extends React.Component {
 
@@ -18,8 +19,10 @@ export default class WorkoutsScreen extends React.Component {
 
         this.state = {
             errorMsg: null,
-            queryParams: null,
 
+            latitude: null,
+            longitude: null,
+            workouts: [],
             showCreateWorkout: false,
         };
     }
@@ -28,7 +31,23 @@ export default class WorkoutsScreen extends React.Component {
 
         this._isMounted = true;
 
-        this.getLocation();
+        let untilDate = new Date();
+        untilDate.setDate(untilDate.getDate() + 3);
+
+        this.getLocation().then(() => {
+            FetchWorkouts(this.state.latitude,
+                this.state.longitude,
+                this.formatDate(new Date()),
+                this.formatDate(untilDate)).then(response => {
+                console.log({FetchWorkouts: response})
+                if (response.workouts) {
+                    console.log('lets set state')
+                    this.setState({workouts: response.workouts})
+                }
+            })
+
+
+        });
     }
 
     componentWillUnmount() {
@@ -37,6 +56,19 @@ export default class WorkoutsScreen extends React.Component {
 
     handleWorkoutPlanned() {
         this.setState({showCreateWorkout: false})
+    }
+
+    formatDate(d) {
+        let month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+
+        return [year, month, day].join('-')
     }
 
     async getLocation() {
@@ -55,7 +87,8 @@ export default class WorkoutsScreen extends React.Component {
 
         if (this._isMounted) {
             this.setState({
-                queryParams: '?lat=' + latitude + '&lng=' + longitude
+                latitude: latitude,
+                longitude: longitude,
             })
         }
     }
@@ -94,31 +127,11 @@ export default class WorkoutsScreen extends React.Component {
         if (!this.state.showCreateWorkout || currentUserKey === null) {
             return <View style={Layout.container}>
                 <FlatList
-                    data={[
-                        {key: 'Devin'},
-                        {key: 'Dan'},
-                        {key: 'Dominic'},
-                        {key: 'Jackson'},
-                        {key: 'James'},
-                        {key: 'Joel'},
-                        {key: 'John'},
-                        {key: 'Jillian'},
-                        {key: 'Jimmy'},
-                        {key: 'Julie'},
-                        {key: '2Devin'},
-                        {key: '2Dan'},
-                        {key: '2Dominic'},
-                        {key: '2Jackson'},
-                        {key: 'J2ames'},
-                        {key: '2Joel'},
-                        {key: '2John'},
-                        {key: '2Jillian'},
-                        {key: '2Jimmy'},
-                        {key: '2Julie'},
-                    ]}
-                    renderItem={({item}) => <Text style={styles.item}>{item.key}</Text>}
+                    data={this.state.workouts}
+                    renderItem={({item}) => <Text style={styles.item}>{item.activity}: {item.name}</Text>}
+                    keyExtractor={(item, index) => index.toString()}
                 />
-                <Text>{this.state.queryParams}</Text>
+                <Text>{this.state.latitude} {this.state.longitude}</Text>
             </View>
         }
     }

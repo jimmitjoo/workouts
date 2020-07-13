@@ -5,8 +5,9 @@ let root = 'https://y9y7etrj87.execute-api.eu-north-1.amazonaws.com/Prod';
 let endpoints = {
     signUp: root + '/create-account',
     signIn: root + '/sign-in',
-    workout: root + '/workouts'
-}
+    workout: root + '/workouts',
+    listWorkouts: root + '/list-workouts'
+};
 
 export function SignIn(email, password) {
 
@@ -118,6 +119,34 @@ export async function SignOut() {
     await SecureStore.deleteItemAsync('signInKey').then(r => signedOut = true);
     await SecureStore.deleteItemAsync('user').then(r => signedOut = true);
     return signedOut;
+}
+
+export function FetchWorkouts(latitude, longitude, todayDate, untilDate) {
+    let responseData = {};
+
+    return fetch(endpoints.listWorkouts, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            latitude: latitude,
+            longitude: longitude,
+            today_date: todayDate,
+            until_date: untilDate,
+        })
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            return json
+        })
+        .catch((error) => {
+            responseData.error = error;
+
+            return responseData;
+        });
+
 }
 
 export function CreateWorkout(starting_at, activity, name, description, latitude, longitude, action_key) {
