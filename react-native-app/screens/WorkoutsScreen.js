@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
 import * as Location from 'expo-location';
 import Layout from "../constants/Layout";
-import WorkoutPlanning from "../components/Workouts/WorkoutPlanning";
+import Planning from "../components/Workouts/Planning";
 import {StateContext} from "../globalState";
 
 export default class WorkoutsScreen extends React.Component {
@@ -13,6 +13,8 @@ export default class WorkoutsScreen extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.props = props
 
         this.state = {
             errorMsg: null,
@@ -31,6 +33,10 @@ export default class WorkoutsScreen extends React.Component {
 
     componentWillUnmount() {
         this._isMounted = false;
+    }
+
+    handleWorkoutPlanned() {
+        this.setState({showCreateWorkout: false})
     }
 
     async getLocation() {
@@ -76,7 +82,7 @@ export default class WorkoutsScreen extends React.Component {
 
         if (this.state.showCreateWorkout && currentUserKey) {
             return <View>
-                <WorkoutPlanning/>
+                <Planning doneHandler={this.handleWorkoutPlanned.bind(this)} navigation={this.props.navigation}/>
                 <Button onPress={() => this.setState({showCreateWorkout: false})} title={"Cancel"}/>
             </View>
         }

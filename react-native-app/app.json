@@ -2,6 +2,7 @@
   "expo": {
     "name": "Where's the Workout?",
     "slug": "wheres-the-workout",
+    "description": "Find people working out nearby, and possibly new friends to workout with in the future.",
     "platforms": [
       "ios",
       "android",
@@ -9,7 +10,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/MateRun.png",
     "scheme": "myapp",
     "splash": {
       "image": "./assets/images/MateRun.png",

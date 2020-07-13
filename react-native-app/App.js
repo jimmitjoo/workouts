@@ -7,6 +7,7 @@ import useCachedResources from './hooks/useCachedResources';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 import { StateProvider } from "./globalState";
+import SingleWorkoutScreen from "./screens/SingleWorkoutScreen";
 
 const Stack = createStackNavigator();
 
@@ -47,6 +48,7 @@ export default function App(props) {
                     <NavigationContainer linking={LinkingConfiguration}>
                         <Stack.Navigator>
                             <Stack.Screen name="Root" component={BottomTabNavigator}/>
+                            <Stack.Screen name="SingleWorkout" component={SingleWorkoutScreen}/>
                         </Stack.Navigator>
                     </NavigationContainer>
                 </StateProvider>

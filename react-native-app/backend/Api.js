@@ -1,18 +1,18 @@
 import * as SecureStore from 'expo-secure-store';
-import { useStateValue } from "../globalState";
 
 let root = 'https://y9y7etrj87.execute-api.eu-north-1.amazonaws.com/Prod';
 
 let endpoints = {
-    signUpPath: root + '/create-account',
-    signInPath: root + '/sign-in',
+    signUp: root + '/create-account',
+    signIn: root + '/sign-in',
+    workout: root + '/workouts'
 }
 
 export function SignIn(email, password) {
 
     let responseData = {};
 
-    return fetch(endpoints.signInPath, {
+    return fetch(endpoints.signIn, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -73,7 +73,7 @@ export function SignUp(name, email, password) {
 
     let responseData = {};
 
-    return fetch(endpoints.signUpPath, {
+    return fetch(endpoints.signUp, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -118,4 +118,34 @@ export async function SignOut() {
     await SecureStore.deleteItemAsync('signInKey').then(r => signedOut = true);
     await SecureStore.deleteItemAsync('user').then(r => signedOut = true);
     return signedOut;
+}
+
+export function CreateWorkout(starting_at, activity, name, description, latitude, longitude, action_key) {
+    let responseData = {};
+
+    return fetch(endpoints.workout, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: name,
+            activity: activity,
+            latitude: latitude,
+            longitude: longitude,
+            action_key: action_key,
+            description: description,
+            starting_at: starting_at,
+        })
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            return json
+        })
+        .catch((error) => {
+            responseData.error = error;
+
+            return responseData;
+        });
 }

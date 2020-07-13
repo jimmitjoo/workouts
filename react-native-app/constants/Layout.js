@@ -17,6 +17,9 @@ export default {
   contentContainer: {
     paddingTop: 30,
   },
+  textContentContainer: {
+    padding: 15
+  },
 
   form: {
     paddingLeft: 30,

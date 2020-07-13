@@ -11,6 +11,7 @@ export default {
         SignUp: 'signup',
         Links: 'links',
         Workouts: 'workouts',
+        SingleWorkout: 'workout',
       },
     },
   },

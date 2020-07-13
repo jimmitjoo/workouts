@@ -4,8 +4,10 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import MapView, {Marker} from 'react-native-maps'
 import Layout from "../../constants/Layout";
 import {StateContext} from "../../globalState";
+import {CreateWorkout} from "../../backend/Api";
+import AntDesignIcon from "../AntDesignIcon";
 
-export default class WorkoutPlanning extends React.Component {
+export default class Planning extends React.Component {
 
     _isMounted = false;
 
@@ -36,6 +38,8 @@ export default class WorkoutPlanning extends React.Component {
             showNamingForm: false,
             name: '',
             description: '',
+
+            posted: false
         }
     }
 
@@ -88,7 +92,7 @@ export default class WorkoutPlanning extends React.Component {
                 return <View>
                     {whenText()}
                     <Button
-                        title={this.state.date.toLocaleString().slice(0, 10) + ' ' + this.state.date.toLocaleString().slice(11, 16)}
+                        title={this.state.date.toLocaleDateString() + ' ' + this.state.date.toLocaleTimeString()}
                         onPress={() => this.setState({showDatePicker: true})}/>
                     <Button onPress={() => {
                         this.setState({
@@ -175,7 +179,6 @@ export default class WorkoutPlanning extends React.Component {
                                     latitude: e.nativeEvent.coordinate.latitude,
                                     longitude: e.nativeEvent.coordinate.longitude,
                                 })
-                                console.log(e.nativeEvent.coordinate)
                             }}
                             title="Meeting Spot"
                             description="Drag this to where you want to meet people."
@@ -191,6 +194,8 @@ export default class WorkoutPlanning extends React.Component {
 
     renderNamingForm() {
         if (this.state.showNamingForm) {
+
+
             return <View>
                 <Text style={Layout.text}>Let's complete the final step and describe your workout.</Text>
                 <View style={Layout.form}>
@@ -212,11 +217,65 @@ export default class WorkoutPlanning extends React.Component {
                         value={this.state.description}
                     />
 
-                    <Button onPress={() => console.log(this.state)} title={"Schedule"}/>
+                    {this.renderScheduleButton()}
+                    {this.renderLoadingIcon()}
 
                 </View>
             </View>
         }
+    }
+
+    renderScheduleButton() {
+        return !this.state.posted ? <Button onPress={() => this.postWorkout()} title={"Schedule"}/> : null
+    }
+
+    renderLoadingIcon() {
+        return this.state.loading ? <AntDesignIcon name="loading2"/> : null;
+    }
+
+    postWorkout() {
+        const [{currentUserKey}, dispatch] = this.context;
+
+        if (this._isMounted) {
+            this.setState({loading:true, posted: true})
+        }
+
+        CreateWorkout(
+            this.state.date,
+            this.state.activity,
+            this.state.name,
+            this.state.description,
+            this.state.latitude,
+            this.state.longitude,
+            currentUserKey
+        ).then(json => {
+            if (this._isMounted) {
+                this.setState({loading:false})
+            }
+
+            this.props.doneHandler();
+
+            let workout = {
+                id: json.id,
+                date: this.state.date,
+                activity: this.state.activity,
+                name: this.state.name,
+                description: this.state.description,
+                latitude: this.state.latitude,
+                longitude: this.state.longitude,
+                joined: true,
+                creator: true,
+            };
+
+            this.props.navigation.navigate("SingleWorkout", {workout: JSON.stringify(workout)});
+
+            console.log(json.id)
+        }).catch(error => {
+            if (this._isMounted) {
+                this.setState({loading:false})
+            }
+            console.log(error)
+        })
     }
 
     render() {

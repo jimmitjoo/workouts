@@ -6,7 +6,7 @@ import WorkoutsScreen from '../screens/WorkoutsScreen';
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import AntDesignIcon from "../components/AntDesignIcon";
-import { useStateValue } from "../globalState";
+import {useStateValue} from "../globalState";
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
@@ -38,13 +38,13 @@ export default function BottomTabNavigator({navigation, route}) {
     function renderSignIn() {
         if (currentUserKey === null) {
             return <BottomTab.Screen
-                    name="SignIn"
-                    component={SignInScreen}
-                    options={{
-                        title: 'Sign In',
-                        tabBarIcon: ({focused}) => <AntDesignIcon focused={focused} name="login"/>,
-                    }}
-                />
+                name="SignIn"
+                component={SignInScreen}
+                options={{
+                    title: 'Sign In',
+                    tabBarIcon: ({focused}) => <AntDesignIcon focused={focused} name="login"/>,
+                }}
+            />
         }
 
         return null;
@@ -90,5 +90,7 @@ function getHeaderTitle(route) {
             return 'Links to learn more';
         case 'Workouts':
             return 'Where\'s the Workout?!';
+        case 'SingleWorkout':
+            return 'Workout';
     }
 }
