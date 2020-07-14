@@ -92,7 +92,7 @@ export default class Planning extends React.Component {
                 return <View>
                     {whenText()}
                     <Button
-                        title={this.state.date.toLocaleDateString() + ' ' + this.state.date.toLocaleTimeString()}
+                        title={this.state.date.toLocaleDateString() + ' ' + this.state.date.toLocaleTimeString().replace(/(.*)\D\d+/, '$1')}
                         onPress={() => this.setState({showDatePicker: true})}/>
                     <Button onPress={() => {
                         this.setState({
